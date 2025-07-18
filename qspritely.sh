@@ -1,8 +1,16 @@
 #!/bin/bash
 
-> sprites.h
+echo "#ifndef SPRITES_H" > sprites.h
+echo "#define SPRITES_H" >> sprites.h
+echo "" >> sprites.h
+
+sprites=()
+sprites_i=0
 
 for filename in "$@"; do
+    spritename="sprite_${filename:0:$(( ${#filename}-4))}"
+    sprites["${sprites_i}"]="${spritename}"
+    sprites_i="$((${sprites_i}+1))"
     in_string=$(hexdump -v -e '/1 "%u\n"' "${filename}")
     byte_strings=()
     for (( i=0; i<8; i++ )); do
@@ -26,7 +34,7 @@ for filename in "$@"; do
         fi
     done <<< "${in_string}"
 
-    echo "static char sprite_${filename:0:$(( ${#filename}-4))}[8] =" >> sprites.h
+    echo "static char ${spritename}[8] =" >> sprites.h
     echo "{" >> sprites.h
     
     for (( i=0; i<8; i++ )); do
@@ -37,3 +45,25 @@ for filename in "$@"; do
     echo "};" >> sprites.h
     echo "" >> sprites.h
 done
+
+echo "enum sprites_e" >> sprites.h
+echo "{" >> sprites.h
+
+for (( i=0; i<sprites_i; i++ )); do
+    echo "  ${sprites[$((i))]^^}," >> sprites.h
+done
+
+echo "};" >> sprites.h
+echo "" >> sprites.h
+
+echo "char *sprites[] =" >> sprites.h
+echo "{" >> sprites.h
+
+for (( i=0; i<sprites_i; i++ )); do
+    echo "  ${sprites[$((i))]}," >> sprites.h
+done
+
+echo "};" >> sprites.h
+echo "" >> sprites.h
+
+echo "#endif" >> sprites.h
