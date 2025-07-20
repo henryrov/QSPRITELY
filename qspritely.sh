@@ -56,14 +56,22 @@ done
 echo "};" >> sprites.h
 echo "" >> sprites.h
 
-echo "char *sprites[] =" >> sprites.h
-echo "{" >> sprites.h
+echo "extern char *sprites[];" >> sprites.h
+
+echo "" >> sprites.h
+echo "#endif" >> sprites.h
+
+# Define sprites array in sprites.c
+
+echo "#include \"sprites.h\"" > sprites.c
+echo "" >> sprites.c
+
+echo "char *sprites[] =" >> sprites.c
+echo "{" >> sprites.c
 
 for (( i=0; i<sprites_i; i++ )); do
-    echo "  ${sprites[$((i))]}," >> sprites.h
+    echo "  ${sprites[$((i))]}," >> sprites.c
 done
 
-echo "};" >> sprites.h
-echo "" >> sprites.h
+echo "};" >> sprites.c
 
-echo "#endif" >> sprites.h
